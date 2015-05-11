@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       Epic battle notifier
 // @author Rashe
-// @version    0.8
+// @version    1.0
 // @description  Alert when epic battle detected, checks every 5 min. It does NOT fight for you, only notify.
 // @match      http://www.erepublik.com/*
 // @copyright  lol what?
@@ -31,14 +31,16 @@ document.onreadystatechange = window.handleState;
 
             debug: false,
             selectors: {
-                epic_selector: 'isEpicBattle'
+                epic_selector: 'isEpicBattle',
+                epic_text: 'war_details_text'
             },
             urls: {
                 war_url: 'http://www.erepublik.com/en/military/campaigns',
                 battle_url_part: 'battlefield-new'
             },
             messages: {
-                message: 'Hey Epic battle is waiting'
+                message: 'Hey Epic battle is waiting',
+                epic_text_span: 'War: Epic battle '
             }
         };
 
@@ -47,7 +49,7 @@ document.onreadystatechange = window.handleState;
         };
 
         this.main = {
-            start: function(){
+            start: function () {
                 _that.main.wait_1min();
             },
             go_to: function () {
@@ -62,8 +64,15 @@ document.onreadystatechange = window.handleState;
                 }
             },
             check_if_epic: function () {
-                if (document.getElementsByClassName(_that.settings.selectors.epic_selector).length > 0) {
-                    alert(_that.settings.messages.message);
+                var elements = document.getElementsByClassName(_that.settings.selectors.epic_selector);
+                if (elements.length > 0) {
+                    for (var i = 0; i < elements.length; i++) {
+                        var parent = elements[i].parentNode,
+                            value = parent.childNodes[0].textContent;
+                        if (value == _that.settings.messages.epic_text_span) {
+                            alert(_that.settings.messages.message);
+                        }
+                    }
                 } else {
                     _that.main.wait_5min();
                 }
